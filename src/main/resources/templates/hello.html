@@ -1,16 +1,50 @@
-<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8"/>
+    <title>广播式WebSocket</title>
+    <script th:src="@{/scripts/sockjs.min.js}"></script>
+    <script th:src="@{/scripts/stomp.min.js}"></script>
+    <script th:src="@{/scripts/jquery.js}"></script>
 </head>
 <body>
+<noscript><h2 style="color: #e80b0a;">Sorry，浏览器不支持WebSocket</h2></noscript>
+<div>
+    <div>
+        <button id="disconnect"  onclick="disconnect();">断开连接</button>
+    </div>
 
-   <div>你好</div>
+    <div id="conversationDiv">
+        <label>输入你的名字</label><input type="text" id="name"/>
+        <button id="sendName" onclick="sendName();">发送</button>
+        <p id="response"></p>
+    </div>
+</div>
+<script type="text/javascript">
+    var stompClient = null;
 
+    var socket = new SockJS('/connect');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+        // setConnected(true);
+        console.log('Connected:' + frame);
+        stompClient.subscribe('/topic/responseMessage', function (response) {
+            console.log("response",response);
+            $("#response").html(JSON.parse(response.body).responseMessage);
+        })
+    });
+
+
+    function sendName() {
+        var name = $('#name').val();
+        stompClient.send("/sendMessage", {}, JSON.stringify({'name': name}));
+    }
+
+
+    function disconnect() {
+        if (stompClient != null) {
+            stompClient.disconnect();
+        }
+    }
+</script>
 </body>
 </html>
-
-<script>
-    console.log([[${now}]])
-</script>

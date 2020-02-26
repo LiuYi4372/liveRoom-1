@@ -1,21 +1,27 @@
 package com.anzi.controller;
 
 
+import com.anzi.model.RequestMessage;
+import com.anzi.model.ResponseMessage;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Controller
-@RequestMapping(value = "/test")
 public class TestController {
 
-    @RequestMapping(value = "/helloWorld.html", method = RequestMethod.GET)
-    public String add(Model model) {
-        model.addAttribute("now",new SimpleDateFormat("yyyy-MM").format(new Date()));
+    @MessageMapping("/sendMessage")
+    @SendTo("/topic/responseMessage")
+    public ResponseMessage say(RequestMessage message) {
+        return new ResponseMessage(message.getName());
+    }
+
+
+    @RequestMapping(value = "/hello",method = RequestMethod.GET)
+    public String hello(){
         return "hello";
     }
 }

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta th:remove="tag" th:include="fragements/header::header(title='直播间')">
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+<div id="Page" v-cloak>
+    <div class="chatroom">
+        <div  v-for="(message,index) in messages" :key="index">
+            <span>{{message}}</span>
+        </div>
+
+        <van-field
+                v-model="inputMessage"
+                center
+                clearable>
+            <van-button slot="button" size="small" type="primary" @click="sendMessage">发送</van-button>
+        </van-field>
+    </div>
+
+
+    </div>
+</div>
+</body>
+
+<footer>
+
+    <div th:remove="tag" th:include="fragements/footer::footer"></div>
+
+    <script type="text/javascript" th:inline="javascript">
+        (function (global) {
+            new Vue({
+                el: '#Page',
+                data: {
+                    messages: [],
+                    inputMessage:""
+                },
+                methods:{
+                    sendMessage:function(){
+                        console.log("inputMessage",this.inputMessage)
+                    }
+                }
+            });
+        })(window);
+
+    </script>
+
+</footer>
+
+
+</html>
+
+
+
+

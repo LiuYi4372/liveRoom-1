@@ -1,0 +1,9 @@
+<footer th:fragment="footer">
+    <script src="/scripts/vue/vue.js"></script>
+    <script src="/scripts/vue/vant-2.1.2.js"></script>
+
+    <script th:inline="javascript">
+        Vue.use(vant);
+        Vue.use(vant.Lazyload, {});
+    </script>
+</footer>
