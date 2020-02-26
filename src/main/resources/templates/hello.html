@@ -22,7 +22,7 @@
 <script type="text/javascript">
     var stompClient = null;
 
-    var socket = new SockJS('/connect');
+    var socket = new SockJS('/start/connect');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         // setConnected(true);

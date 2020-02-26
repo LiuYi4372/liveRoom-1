@@ -12,14 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class TestController {
-
-    @MessageMapping("/sendMessage")
-    @SendTo("/topic/responseMessage")
-    public ResponseMessage say(RequestMessage message) {
-        return new ResponseMessage(message.getName());
-    }
-
-
     @RequestMapping(value = "/hello",method = RequestMethod.GET)
     public String hello(){
         return "hello";

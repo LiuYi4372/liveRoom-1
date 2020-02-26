@@ -9,5 +9,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
     <meta name="format-detection" content="telephone=no"/>
     <meta http-equiv="x-dns-prefetch-control" content="on"/>
+    <meta name="CDN" th:content="${CDN}" th:if="${CDN!=''}"/>
+    <meta name="CDN" content="" th:else/>
+    <link th:href="@{/styles/vant-2.1.2.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/styles/weui.css}" rel="stylesheet" type="text/css"/>
 </head>
 

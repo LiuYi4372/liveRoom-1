@@ -5,6 +5,12 @@
     <meta th:remove="tag" th:include="fragements/header::header(title='直播间')">
     <style>
 
+        .send-message {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
     </style>
 </head>
 
@@ -12,38 +18,98 @@
 
 <div id="Page" v-cloak>
     <div class="chatroom">
-        <div  v-for="(message,index) in messages" :key="index">
-            <span>{{message}}</span>
+        <div v-for="(message,index) in messages" :key="index" class="weui-flex">
+            <van-image width="30" height="30" :src="message.head_img_url"></van-image>
+            <div>{{message.nick_name+":"+message.message}}</div>
         </div>
 
-        <van-field
-                v-model="inputMessage"
-                center
-                clearable>
-            <van-button slot="button" size="small" type="primary" @click="sendMessage">发送</van-button>
-        </van-field>
+        <van-cell-group class="send-message">
+            <van-field v-model="inputMessage" center>
+                <van-button slot="button" size="small" type="primary" @click="send">发送</van-button>
+            </van-field>
+        </van-cell-group>
     </div>
 
 
-    </div>
+</div>
 </div>
 </body>
 
 <footer>
 
     <div th:remove="tag" th:include="fragements/footer::footer"></div>
+    <script th:src="@{/scripts/sockjs.min.js}"></script>
+    <script th:src="@{/scripts/stomp.min.js}"></script>
 
     <script type="text/javascript" th:inline="javascript">
         (function (global) {
+            var roomUid=[[${roomUid}]];
+            var user={
+                user_uid:[[${userUid}]],
+                nick_name: '安子',
+                head_img_url: 'https://s1.ouyada.com/20200225/noInviteRecord.svg'
+            }
+
+            class Message{
+                constructor(message){
+                    this.roomUid=roomUid;
+                    this.userUid=user.user_uid;
+                    this.nickName=user.nick_name;
+                    this.headImgUrl=user.head_img_url;
+                    this.message=message;
+                    return this;
+                }
+            }
+
+
             new Vue({
                 el: '#Page',
                 data: {
+                    roomUid:[[${roomUid}]],
                     messages: [],
-                    inputMessage:""
+                    inputMessage: "",
+                    stompClient: null,
+                    user:user
                 },
-                methods:{
-                    sendMessage:function(){
-                        console.log("inputMessage",this.inputMessage)
+                mounted() {
+                    var _this = this;
+                    var socket = new SockJS('/start/connect');
+                    _this.stompClient = Stomp.over(socket);
+                    _this.stompClient.connect({
+                        username:_this.user.user_uid,
+                        password:_this.user.user_uid,
+                        roomUid:_this.roomUid
+                    }, function (frame) {
+                        if(frame.command!='CONNECTED'){
+                            console.log("连接失败,网络繁忙，请稍后重试");
+                            return;
+                        }
+                        _this.sendMessage("进入直播间");
+                        //返回信息里可以加一条直播间当前人数
+                        _this.stompClient.subscribe('/user/'+_this.user.user_uid+'/queue/shouts', function (response) {
+                            _this.inputMessage="";
+                            _this.messages.push(JSON.parse(response.body));
+                        },function (err) {
+                            //连接失败，可以🔙上一页
+                            console.log("err: " + err);
+                        })
+
+                    });
+                },
+                destroyed: function () {
+                    this.stompClient.disconnect(
+                        function () {
+                          //可以记录离开人数，发送离开信息
+                            alert("断开连接");
+                        });
+                },
+                methods: {
+                    send:function(){
+                        this.sendMessage(this.inputMessage);
+                    },
+                    sendMessage: function (messsage) {
+                        var message=new Message(messsage);
+                        this.stompClient.send("/app/singleShout", {}, JSON.stringify(message));
                     }
                 }
             });
