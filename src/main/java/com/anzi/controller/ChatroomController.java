@@ -58,6 +58,15 @@ public class ChatroomController {
     }
 
 
+    @ResponseBody
+    @RequestMapping(value = "/liveRoom", method = RequestMethod.POST)
+    public void liveRoom(@RequestBody String payload, HttpServletRequest request) {
+        User user = JSON.parseObject(payload, User.class);
+        JSONObject jsonObject=JSON.parseObject(payload);
+        roomAndUserService.updateStatuse("TYP_OFF",jsonObject.getString("userUid"),jsonObject.getString("roomUid"));
+    }
+
+
     @MessageMapping("/singleShout")
     public void singleUser(RequestMessage requestMessage, StompHeaderAccessor stompHeaderAccessor) {
         Principal user = stompHeaderAccessor.getUser();
@@ -66,8 +75,6 @@ public class ChatroomController {
                 roomAndUsers.stream().forEach(roomAndUser ->{
                     simpMessageSendingOperations.convertAndSendToUser(roomAndUser.getUserUid(), "/queue/shouts", requestMessage);
         });
-
-
     }
 }
 

@@ -75,10 +75,15 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
                     String userUid = accessor.getNativeHeader("userUid").get(0);
 
                     // TODO: 2020/2/27  用户进入房间，用户和房间号绑定
-                   int index= roomAndUserService.insertRecord(userUid,roomUid);
-                   if(index<=0){
-                       throw new RuntimeException();
-                   }
+                    int userIndex=roomAndUserService.userCount(userUid,roomUid);
+                    if(userIndex>0){
+                        roomAndUserService.updateStatuse("TYP_ON",userUid,roomUid);
+                    }else{
+                        int index= roomAndUserService.insertRecord(userUid,roomUid);
+                        if(index<=0){
+                            throw new RuntimeException();
+                        }
+                    }
 
                     Principal principal = new Principal() {
                         @Override
