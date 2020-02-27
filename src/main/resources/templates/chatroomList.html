@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta th:remove="tag" th:include="fragements/header::header(title='登录')">
+</head>
+
+<body>
+
+<div id="Page" v-cloak>
+    <van-cell-group>
+        <van-cell v-for="(room,index) in rooms" :title="room.room_name" is-link :url="'/'+room.room_uid+'/chatroom'"></van-cell>
+    </van-cell-group>
+
+</div>
+</body>
+
+<footer>
+
+    <div th:remove="tag" th:include="fragements/footer::footer"></div>
+
+    <script type="text/javascript" th:inline="javascript">
+        (function (global) {
+            new Vue({
+                el: '#Page',
+                data: {
+                    rooms:[]
+                },
+                mounted(){
+                    var _this=this;
+                    Vue.axios.post('/getChatroomList', {})
+                        .then(function (result) {
+                            _this.rooms= _this.rooms.concat(result.data);
+                        })
+                        .catch(function (error) {
+                            _this.$toast('服务器异常请稍后重试');
+                        })
+                },
+                methods: {
+
+                }
+            });
+        })(window);
+
+    </script>
+
+</footer>
+
+
+</html>

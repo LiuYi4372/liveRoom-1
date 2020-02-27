@@ -1,0 +1,35 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.anzi.mapper.RoomAndUserMapper">
+
+    <resultMap type="com.anzi.pojo.RoomAndUser" id="RoomAndUserMap">
+        <result column="relation_uid" property="relationUid"/>
+        <result column="room_uid" property="roomUid"/>
+        <result column="user_uid" property="userUid"/>
+    </resultMap>
+
+
+    <insert id="insertRecord">
+        INSERT INTO room_and_user
+             (relation_uid,user_uid,room_uid,role,status)
+        VALUES
+            (tnt_uuid_short(), #{userUid}, #{roomUid},'audience','TYP_ON')
+    </insert>
+
+    <select id="userCount" resultType="java.lang.Integer">
+         select count(*) from room_and_user where room_uid=#{roomUid} and user_uid=#{userUid}
+    </select>
+
+
+    <select id="listRecordByRoomUid" resultMap="RoomAndUserMap">
+       select relation_uid,room_uid,user_uid from room_and_user where room_uid=#{roomUid} and status='TYP_ON'
+    </select>
+
+    <update id="updateStatuse">
+        update room_and_user
+        set status = #{status}
+       where room_uid=#{roomUid} and user_uid=#{userUid}
+    </update>
+
+
+
+</mapper>

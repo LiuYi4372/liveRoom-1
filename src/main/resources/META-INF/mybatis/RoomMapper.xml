@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.anzi.mapper.RoomMapper">
+
+    <resultMap type="com.anzi.pojo.Room" id="roomMap">
+        <result column="room_uid" property="roomUid"/>
+        <result column="room_name" property="roomName"/>
+    </resultMap>
+
+
+    <select id="listRoom" resultMap="roomMap">
+       select room_uid,room_name from room where status='TYP_ON'
+    </select>
+
+</mapper>
