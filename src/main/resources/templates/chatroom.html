@@ -18,9 +18,9 @@
 
 <div id="Page" v-cloak>
     <div class="chatroom">
-        <div v-for="(message,index) in messages" :key="index" class="weui-flex">
-            <van-image width="30" height="30" :src="message.head_img_url"></van-image>
-            <div>{{message.nick_name+":"+message.message}}</div>
+        <div v-for="(message,index) in messages" :key="index">
+<!--            <van-image width="30" height="30" :src="message.head_img_url"></van-image>-->
+            <div>{{message.nickName+":"+message.message}}</div>
         </div>
 
         <van-cell-group class="send-message">
@@ -44,18 +44,14 @@
     <script type="text/javascript" th:inline="javascript">
         (function (global) {
             var roomUid=[[${roomUid}]];
-            var user={
-                user_uid:[[${userUid}]],
-                nick_name: '安子',
-                head_img_url: 'https://s1.ouyada.com/20200225/noInviteRecord.svg'
-            }
+            var user=[[${user}]];
 
             class Message{
                 constructor(message){
                     this.roomUid=roomUid;
-                    this.userUid=user.user_uid;
-                    this.nickName=user.nick_name;
-                    this.headImgUrl=user.head_img_url;
+                    this.userUid=user.userid;
+                    this.nickName=user.nickName;
+                    this.headImgUrl=user.headImgrl;
                     this.message=message;
                     return this;
                 }
@@ -76,17 +72,14 @@
                     var socket = new SockJS('/start/connect');
                     _this.stompClient = Stomp.over(socket);
                     _this.stompClient.connect({
-                        username:_this.user.user_uid,
-                        password:_this.user.user_uid,
-                        roomUid:_this.roomUid
+                        username:_this.user.userUid,
+                        password:_this.user.userUid,
+                        roomUid:_this.roomUid,
+                        userUid:_this.user.userUid
                     }, function (frame) {
-                        if(frame.command!='CONNECTED'){
-                            console.log("连接失败,网络繁忙，请稍后重试");
-                            return;
-                        }
                         _this.sendMessage("进入直播间");
                         //返回信息里可以加一条直播间当前人数
-                        _this.stompClient.subscribe('/user/'+_this.user.user_uid+'/queue/shouts', function (response) {
+                        _this.stompClient.subscribe('/user/'+_this.user.userUid+'/queue/shouts', function (response) {
                             _this.inputMessage="";
                             _this.messages.push(JSON.parse(response.body));
                         },function (err) {
@@ -94,6 +87,10 @@
                             console.log("err: " + err);
                         })
 
+                    },function (err) {
+                        //连接失败，可以🔙上一页
+                        _this.$toast("连接失败,网络繁忙，请稍后重试");
+                        window.history.go(-1);
                     });
                 },
                 destroyed: function () {

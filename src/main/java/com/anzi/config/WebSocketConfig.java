@@ -1,5 +1,10 @@
 package com.anzi.config;
 
+import com.anzi.pojo.User;
+import com.anzi.service.Impl.UserServiceImpl;
+import com.anzi.service.RoomAndUserService;
+import com.anzi.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -21,6 +26,9 @@ import java.util.List;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+
+    @Autowired
+    RoomAndUserService roomAndUserService;
 
     /**
      * 将"/hello"路径注册为STOMP端点，这个路径与发送和接收消息的目的路径有所不同，这是一个端点，客户端在订阅或发布消息到目的地址前，要连接该端点，
@@ -64,8 +72,14 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
                     String username = accessor.getNativeHeader("username").get(0);
                     String password = accessor.getNativeHeader("password").get(0);
                     String roomUid = accessor.getNativeHeader("roomUid").get(0);
+                    String userUid = accessor.getNativeHeader("userUid").get(0);
 
                     // TODO: 2020/2/27  用户进入房间，用户和房间号绑定
+                   int index= roomAndUserService.insertRecord(userUid,roomUid);
+                   if(index<=0){
+                       throw new RuntimeException();
+                   }
+
                     Principal principal = new Principal() {
                         @Override
                         public String getName() {

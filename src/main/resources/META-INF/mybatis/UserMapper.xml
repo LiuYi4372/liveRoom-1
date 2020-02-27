@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.anzi.mapper.UserMapper">
+
+    <resultMap type="com.anzi.pojo.User" id="userMap">
+        <result column="user_uid" property="userUid"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="phone" property="phone"/>
+    </resultMap>
+
+
+    <insert id="insertUser">
+        INSERT INTO user
+             (user_uid,nick_name,phone)
+        VALUES
+            (tnt_uuid_short(), #{nickName}, #{phone})
+    </insert>
+
+    <select id="listUserByPhone" resultMap="userMap">
+       select user_uid,nick_name,phone from user where phone=#{phone}
+    </select>
+
+</mapper>
